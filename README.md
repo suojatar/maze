@@ -1,6 +1,6 @@
 # Maze Exercise
 
-This solution was developed in Visual Studio 2015. It is inplemented as an ASP.NET Web API exposing a single endpoint, /solveMaze.
+This solution was developed in Visual Studio 2015. It is implemented as an ASP.NET Web API exposing a single endpoint, /solveMaze.
 
 ## Approach
 

@@ -42,17 +42,21 @@ namespace MazeExercise.Application
 			{
 				string textLine;
 				int rowIndex = 0;
+				int cellIndex = 0;
 
 				while ((textLine = strRdr.ReadLine()) != null)
 				{
 					for (int i = 0; i < textLine.Length; ++i)
 					{
-						var cellIndex = rowIndex * dimX + i;
+						cellIndex = rowIndex * dimX + i;
 						strBldr.Append((solutionPath.Contains(cellIndex) && textLine[i] != END_TOKEN) ? PATH_TOKEN : textLine[i]);
 					}
 
-					strBldr.AppendLine();
-					++rowIndex;
+					if (cellIndex < dimX * dimY - 1)
+					{
+						strBldr.AppendLine();
+						++rowIndex;
+					}
 				}
 			}
 
