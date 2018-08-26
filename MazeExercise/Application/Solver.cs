@@ -1,10 +1,8 @@
 ﻿using MazeExercise.Domain;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
-using System.Web;
 
 using static MazeExercise.Application.Maze;
 
@@ -19,49 +17,89 @@ namespace MazeExercise.Application
 			myMaze = maze; //set it in constructor for immutability
 		}
 
-		public MazeSolution Solve()
+		public MazeSolution Solve(int searchType)
 		{
+			const string ERROR_MESSAGE = "This maze has no solution!";
+
 			int dimX = myMaze.DimensionX, dimY = myMaze.DimensionY;
 
 			var visitedPositions = new HashSet<int>(); //stores indices of cells that have been visited
 			var solutionPath = new List<int>(); //stores indices of cells that are part of the solution path
 
-			bool solutionResult = IsEndIndexReachedRecursive(myMaze.StartIndex, solutionPath, visitedPositions);
-
-			if (!solutionResult)
+			if (searchType == 0)
 			{
-				throw new InvalidOperationException("This maze has no solution!");
+				bool solutionResult = IsEndIndexReachedRecursive(myMaze.StartIndex, solutionPath, visitedPositions);
+
+				if (!solutionResult)
+					throw new InvalidOperationException(ERROR_MESSAGE);
+			}
+			else
+			{
+				solutionPath = TraverseUntilEndIndex();
+
+				if (solutionPath == null)
+					throw new InvalidOperationException(ERROR_MESSAGE);
 			}
 
 			solutionPath.Reverse(); //the Solution path cells are stored in backward order, we need to reverse it
+			string mapWithSolution = BuildMapWithSolution(solutionPath);
 
-			//build map with solution path
-			var strBldr = new StringBuilder((dimX + 2) * dimY); //allocate space for \r\n on each line (hence 2 more characters)
+			MazeSolution solution = new MazeSolution(solutionPath.Count, mapWithSolution);
+			return solution;
+		}
 
-			using (var strRdr = new StringReader(myMaze.MazeMap))
+
+		////////////////////////////
+		/// <summary>
+		/// Breadth-first seach. This will return the shortest possible solution.
+		/// </summary>
+		////////////////////////////
+		private List<int> TraverseUntilEndIndex()
+		{
+			var queuedCells = new Queue<int>(); //stores cell indices that are waiting to be visited, in the FIFO manner
+			var visitedCells = new HashSet<int>(); //stores whether a cell index has already been visited
+			var queuedCellsByIndex = new HashSet<int>(); //stores whether a cell index has already been queued for visiting. Contains the same cells as queuedCells; however, the search is optimized based on index.
+			var refererCells = new Dictionary<int, int>(); //stores how to trace celld back in reverse order: from end to start
+
+			queuedCells.Enqueue(myMaze.StartIndex); //add the start cell first
+
+			while (queuedCells.Count != 0)
 			{
-				string textLine;
-				int rowIndex = 0;
-				int cellIndex = 0;
+				var currentIndex = queuedCells.Dequeue();
 
-				while ((textLine = strRdr.ReadLine()) != null)
+				if (currentIndex != myMaze.EndIndex)
 				{
-					for (int i = 0; i < textLine.Length; ++i)
+					foreach (var neighbor in myMaze.Neighbors(currentIndex))
 					{
-						cellIndex = rowIndex * dimX + i;
-						strBldr.Append((solutionPath.Contains(cellIndex) && textLine[i] != END_TOKEN) ? PATH_TOKEN : textLine[i]);
+						if (visitedCells.Contains(neighbor))
+							continue;
+
+						if (!queuedCellsByIndex.Contains(neighbor))
+						{
+							refererCells[neighbor] = currentIndex; // specify how to trace back from neighbor to its referer, which is currentIndex
+
+							queuedCellsByIndex.Add(neighbor);
+							queuedCells.Enqueue(neighbor); //add neighbor to queue
+						}
 					}
 
-					if (cellIndex < dimX * dimY - 1)
-					{
-						strBldr.AppendLine();
-						++rowIndex;
-					}
+					visitedCells.Add(currentIndex);
+				}
+				else //here we'll go backwards - from the end cell through every referer in refererCells
+				{
+					var solutionPath = new List<int>();
+
+					solutionPath.Add(currentIndex);
+
+					// Trace back path based on the information in the refererCells dictionary and returns the shortest path
+					while ((currentIndex = refererCells[currentIndex]) != myMaze.StartIndex)
+						solutionPath.Add(currentIndex);
+
+					return solutionPath;
 				}
 			}
 
-			MazeSolution solution = new MazeSolution(solutionPath.Count, strBldr.ToString());
-			return solution;
+			return null;
 		}
 
 
@@ -92,6 +130,28 @@ namespace MazeExercise.Application
 			}
 
 			return false;
+		}
+
+
+		public string BuildMapWithSolution(IEnumerable<int> solutionPath)
+		{
+			List<string> mazeRowsWithSolution = myMaze.MazeRows.ToList();
+
+			foreach (var aIt in solutionPath)
+			{
+				if (aIt != myMaze.EndIndex)
+				{
+					int posX = aIt % myMaze.DimensionX;
+					int posY = aIt / myMaze.DimensionX;
+
+					StringBuilder row = new StringBuilder(mazeRowsWithSolution[posY]);
+					row[posX] = PATH_TOKEN;
+
+					mazeRowsWithSolution[posY] = row.ToString();
+				}
+			}
+
+			return string.Join(Environment.NewLine, mazeRowsWithSolution);
 		}
 	}
 }

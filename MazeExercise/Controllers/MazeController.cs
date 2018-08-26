@@ -28,7 +28,7 @@ namespace MazeExercise.Controllers
 
 			try
 			{
-				solution = solver.Solve();
+				solution = solver.Solve(mazeMap.SearchType);
 			}
 			catch (InvalidOperationException ex)
 			{

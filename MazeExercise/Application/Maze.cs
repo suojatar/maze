@@ -30,7 +30,7 @@ namespace MazeExercise.Application
 		private readonly int myDimensionX, myDimensionY;
 		private readonly CellType[] myCells;
 		private readonly int myStartIndex, myEndIndex;
-		private readonly string myMazeMap;
+		private readonly string[] myMazeRows;
 
 		public int DimensionX { get { return myDimensionX; } }
 		public int DimensionY { get { return myDimensionY; } }
@@ -38,16 +38,17 @@ namespace MazeExercise.Application
 		public int StartIndex { get { return myStartIndex; } }
 		public int EndIndex { get { return myEndIndex; } }
 
-		public string MazeMap { get { return myMazeMap; } }
+		public string[] MazeRows { get { return myMazeRows; } }
 
-		private Maze(int dimensionX, int dimensionY, CellType[] cells, int startIndex, int endIndex, string mazeMap)
+		//private Maze(int dimensionX, int dimensionY, CellType[] cells, int startIndex, int endIndex, string mazeMap)
+		private Maze(int dimensionX, int dimensionY, CellType[] cells, int startIndex, int endIndex, string[] mazeRows)
 		{
 			myDimensionX = dimensionX;
 			myDimensionY = dimensionY;
 			myCells = cells;
 			myStartIndex = startIndex;
 			myEndIndex = endIndex;
-			myMazeMap = mazeMap;
+			myMazeRows = mazeRows;
 		}
 
 
@@ -57,9 +58,12 @@ namespace MazeExercise.Application
 			int startIndex = -1, endIndex = -1;
 
 			var cellList = new List<CellType>();
+			var rowList = new List<string>(); //stores a collection of maze rows - we'll need this when we generate the solution map
 
 			Action<string> iProcessLine = line =>
 			{
+				rowList.Add(line);
+
 				foreach (char aIt in line)
 				{
 					switch (aIt)
@@ -100,8 +104,9 @@ namespace MazeExercise.Application
 				while ((textLine = strRdr.ReadLine()) != null) //parse the rest of the lines
 					iProcessLine(textLine); //calling this Action to preserve all the in-memory values
 
-				//now we've got all the pieces needed to create a Maze
-				return new Maze(dimensionX, dimensionY, cellList.ToArray(), startIndex, endIndex, mazeMap);
+				//now we've got all the pieces needed to create a Maze object
+				//return new Maze(dimensionX, dimensionY, cellList.ToArray(), startIndex, endIndex, mazeMap);
+				return new Maze(dimensionX, dimensionY, cellList.ToArray(), startIndex, endIndex, rowList.ToArray());
 			}
 		}
 
