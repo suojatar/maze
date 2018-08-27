@@ -151,16 +151,6 @@ namespace MazeExercise.Application
 				if (newCellType == CellType.Open || newCellType == CellType.End)
 					yield return newCellIndex;
 			}
-
-
-			if ((current % myDimensionX) > 0) //look left first
-			{
-				var newCellIndex = current - 1;
-				var newCellType = GetCellType(newCellIndex);
-
-				if (newCellType == CellType.Open || newCellType == CellType.End)
-					yield return newCellIndex;
-			}
 		}
 
 		public CellType GetCellType(int index)
