@@ -21,14 +21,11 @@ namespace MazeExercise.Application
 		{
 			const string ERROR_MESSAGE = "This maze has no solution!";
 
-			int dimX = myMaze.DimensionX, dimY = myMaze.DimensionY;
-
-			var visitedPositions = new HashSet<int>(); //stores indices of cells that have been visited
 			var solutionPath = new List<int>(); //stores indices of cells that are part of the solution path
 
 			if (searchType == 0)
 			{
-				bool solutionResult = IsEndIndexReachedRecursive(myMaze.StartIndex, solutionPath, visitedPositions);
+				bool solutionResult = IsEndIndexReachedRecursive(myMaze.StartIndex, solutionPath);
 
 				if (!solutionResult)
 					throw new InvalidOperationException(ERROR_MESSAGE);
@@ -108,10 +105,13 @@ namespace MazeExercise.Application
 		/// This algotithm is very fast and efficient (a 1,000,000 x 1,000,000 matrix would probably cause stack overflow but for reasonable sizes it's quite good).
 		/// It NOT meant to return the shortest solution, instead, the method will return the FIRST valid solution (there may be others that are shorter).
 		/// </summary>
-		private bool IsEndIndexReachedRecursive(int cur, List<int> solution, HashSet<int> visited)
+		private bool IsEndIndexReachedRecursive(int cur, List<int> solution, HashSet<int> visited = null)
 		{
 			if (myMaze.GetCellType(cur) == CellType.End)
 				return true;
+
+			if (visited == null)
+				visited = new HashSet<int>(); //stores indices of cells that have been visited
 
 			foreach (var cell in myMaze.Neighbors(cur))
 			{

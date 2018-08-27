@@ -112,7 +112,6 @@ namespace MazeExercise.Application
 
 		/// <summary>
 		/// We are creating a collection of neighboring cells. There cannot be more than 4 (left-right-up-down).
-		/// Since the lookup order is hard-set, the array will always contain the same set of elements (this is by design but can be changed).
 		/// </summary>
 		public IEnumerable<int> Neighbors(int current)
 		{
