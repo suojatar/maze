@@ -16,7 +16,7 @@ The application uses two search algorithms: (1) Depth-first search (DFS) and (2)
 ### To run from full IIS:
 
 1. Clone the repository to a location on your hard drive.
-2. Open the VS solution and publish the project MazeExcersize using your preferred Publish Method.
-3. Run a build to ensure all NuGet packages are installed.
+2. Open the VS solution and run a build to ensure all NuGet packages are installed.
+3. Publish the project MazeExcersize using your preferred Publish Method.
 4. In IIS Manager, create a new site and point it to the folder with the deployed solution. Specify Port: **8080** and Application pool: **DefaultAppPool** (for test purposes only).
 5. In your web browser, navigate to **http://localhost:8080/index.html**.
