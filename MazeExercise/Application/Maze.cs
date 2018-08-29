@@ -40,7 +40,6 @@ namespace MazeExercise.Application
 
 		public string[] MazeRows { get { return myMazeRows; } }
 
-		//private Maze(int dimensionX, int dimensionY, CellType[] cells, int startIndex, int endIndex, string mazeMap)
 		private Maze(int dimensionX, int dimensionY, CellType[] cells, int startIndex, int endIndex, string[] mazeRows)
 		{
 			myDimensionX = dimensionX;
